@@ -18,7 +18,8 @@ namespace Bank_App_DTOs.Entities
         [Required]
         public string Name { get; set; }
         [Required]
-        public int PhoneNumber { get; set; }
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be a 10-digit number.")]
+        public string PhoneNumber { get; set; }
         [Required]
         public string EmailAddress { get; set; }
         public string Address { get; set; }
