@@ -1,4 +1,4 @@
-﻿using Bank_App_DTOs.Entities;
+﻿using Bank_App_DB_Context_Repo.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank_App_DB_Context_Repo
