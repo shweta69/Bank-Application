@@ -28,8 +28,6 @@ namespace Bank_App_API.Controllers
             {
                 if (user == null)
                     return BadRequest("User data is null");
-                //if (!ModelState.IsValid)
-                //    return BadRequest(ModelState);
                 var existingUser = await _userDb.Users.FirstOrDefaultAsync(u => u.CustomerId == user.CustomerId);
                 if (existingUser != null)
                     return Conflict("User with this Customer ID already exists");
@@ -46,11 +44,11 @@ namespace Bank_App_API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> login(string username, int customerId, string password)
+        public async Task<IActionResult> login(int customerId, string password)
         {
             try
             {
-                var result = await _userDb.Users.FirstOrDefaultAsync(u => u.Name.ToLower().Trim() == username.ToLower().Trim() && u.CustomerId == customerId);
+                var result = await _userDb.Users.FirstOrDefaultAsync(u=> u.CustomerId == customerId);
                 if (result == null)
                     return Unauthorized("Invalid credentials");
 

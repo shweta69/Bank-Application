@@ -21,7 +21,29 @@ namespace Bank_App_DB_Context_Repo.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Bank_App_DTOs.Entities.User", b =>
+            modelBuilder.Entity("Bank_App_DB_Context_Repo.Entities.Account", b =>
+                {
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AccountType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Balance")
+                        .HasMaxLength(100)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AccountId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("Bank_App_DB_Context_Repo.Entities.User", b =>
                 {
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
@@ -52,6 +74,17 @@ namespace Bank_App_DB_Context_Repo.Migrations
                     b.HasKey("CustomerId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Bank_App_DB_Context_Repo.Entities.Account", b =>
+                {
+                    b.HasOne("Bank_App_DB_Context_Repo.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

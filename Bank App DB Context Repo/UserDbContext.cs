@@ -10,5 +10,6 @@ namespace Bank_App_DB_Context_Repo
         }
 
         public DbSet<User> Users { get; set; } 
+        public DbSet<Account> Accounts { get; set; }
     }
 }
