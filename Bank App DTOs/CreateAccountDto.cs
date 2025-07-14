@@ -5,7 +5,7 @@ namespace Bank_App_DTOs
     public class CreateAccountDto
     {
         [Required]
-        public AccountTypes AccountTypes { get; set; }
+        public AccountTypes AccountType { get; set; }
 
         [Required]
         [MaxLength(100)]
