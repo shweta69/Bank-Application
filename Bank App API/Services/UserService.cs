@@ -15,27 +15,22 @@ namespace Bank_App_API.Services
         public async Task<string> CreateAccountAsync(CreateAccountDto createAccount, int customerId)
         {
             try {
-                // Step 1: Validate AccountType (should be in enum range)
                 if (!Enum.IsDefined(typeof(AccountTypes), createAccount.AccountType))
                     return "Invalid account type selected.";
 
-                // Step 2: Validate Balance
                 if (createAccount.InitialBalance < 5000)
                     return "Initial balance must be at least Rs.5000.";
 
-                // Step 3: Check if customer exists
                 var userExists = await _context.Users.AnyAsync(u => u.CustomerId == customerId);
                 if (!userExists)
                     return "Customer does not exist.";
 
-                // Step 4: Generate unique 6-digit AccountId
                 int accountId;
                 do
                 {
                     accountId = new Random().Next(100000, 999999);
                 } while (await _context.Accounts.AnyAsync(a => a.AccountId == accountId));
 
-                // Step 5: Create and save account
                 var newAccount = new Account
                 {
                     AccountId = accountId,
@@ -47,13 +42,11 @@ namespace Bank_App_API.Services
                 _context.Accounts.Add(newAccount);
                 await _context.SaveChangesAsync();
 
-                // Step 6: Return success message
                 return $"Account created successfully. Your Account ID is: {accountId}";
 
             }
             catch (Exception ex)
             {
-                // Log the exception (not implemented here)
                 return $"An error occurred while creating the account: {ex.Message}";
             }
         }

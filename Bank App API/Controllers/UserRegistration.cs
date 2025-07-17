@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Bank_App_DB_Context_Repo;
 using Bank_App_DB_Context_Repo.Entities;
+using Bank_App_DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,25 +22,54 @@ namespace Bank_App_API.Controllers
             this._userDb = _userDb;
             this._config = _config; 
         }
+
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser(User user)
+        public async Task<IActionResult> RegisterUser(RegisterUserDto user)
         {
             try
             {
                 if (user == null)
                     return BadRequest("User data is null");
-                var existingUser = await _userDb.Users.FirstOrDefaultAsync(u => u.CustomerId == user.CustomerId);
-                if (existingUser != null)
-                    return Conflict("User with this Customer ID already exists");
+
+                // Generate unique CustomerId
+                int customerId;
+                do
+                {
+                    customerId = new Random().Next(100000, 999999);
+                } while (await _userDb.Users.AnyAsync(u => u.CustomerId == customerId));
+
                 var hasher = new PasswordHasher<User>();
-                user.Password = hasher.HashPassword(user, user.Password);
-                await _userDb.Users.AddAsync(user);
+
+                // With this alternative approach:
+                var tempUser = new User
+                {
+                    Name = user.Name,
+                    PhoneNumber = user.PhoneNumber,
+                    EmailAddress = user.EmailAddress,
+                    Address = user.Address,
+                    IsAdmin = user.IsAdmin
+                };
+                var hashedPassword = hasher.HashPassword(tempUser, user.Password);
+
+                var newUser = new User
+                {
+                    CustomerId = customerId,
+                    Name = user.Name,
+                    PhoneNumber = user.PhoneNumber,
+                    EmailAddress = user.EmailAddress,
+                    Address = user.Address,
+                    Password = hashedPassword,
+                    IsAdmin = user.IsAdmin
+                };
+
+                await _userDb.Users.AddAsync(newUser);
                 await _userDb.SaveChangesAsync();
-                return Ok("user registered sucessfully");
-                //return CreatedAtAction(nameof(RegisterUser), new { id = user.CustomerId }, user);
-            }catch(Exception ex)
+
+                return Ok($"User registered successfully. Your Customer ID is: {customerId}");
+            }
+            catch (Exception ex)
             {
-                throw ex;
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
